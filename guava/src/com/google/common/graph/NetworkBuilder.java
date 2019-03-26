@@ -20,7 +20,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.graph.Graphs.checkNonNegative;
 
 import com.google.common.annotations.Beta;
-import com.google.common.annotations.GwtIncompatible;
 import com.google.common.base.Optional;
 
 /**
@@ -47,10 +46,15 @@ import com.google.common.base.Optional;
  *
  * @author James Sexton
  * @author Joshua O'Madadhain
+ * @param <N> The most general node type this builder will support. This is normally {@code Object}
+ *     unless it is constrained by using a method like {@link #nodeOrder}, or the builder is
+ *     constructed based on an existing {@code Network} using {@link #from(Network)}.
+ * @param <N> The most general edge type this builder will support. This is normally {@code Object}
+ *     unless it is constrained by using a method like {@link #edgeOrder}, or the builder is
+ *     constructed based on an existing {@code Network} using {@link #from(Network)}.
  * @since 20.0
  */
 @Beta
-@GwtIncompatible
 public final class NetworkBuilder<N, E> extends AbstractGraphBuilder<N> {
   boolean allowsParallelEdges = false;
   ElementOrder<? super E> edgeOrder = ElementOrder.insertion();
@@ -63,12 +67,12 @@ public final class NetworkBuilder<N, E> extends AbstractGraphBuilder<N> {
 
   /** Returns a {@link NetworkBuilder} for building directed networks. */
   public static NetworkBuilder<Object, Object> directed() {
-    return new NetworkBuilder<Object, Object>(true);
+    return new NetworkBuilder<>(true);
   }
 
   /** Returns a {@link NetworkBuilder} for building undirected networks. */
   public static NetworkBuilder<Object, Object> undirected() {
-    return new NetworkBuilder<Object, Object>(false);
+    return new NetworkBuilder<>(false);
   }
 
   /**
@@ -142,7 +146,7 @@ public final class NetworkBuilder<N, E> extends AbstractGraphBuilder<N> {
 
   /** Returns an empty {@link MutableNetwork} with the properties of this {@link NetworkBuilder}. */
   public <N1 extends N, E1 extends E> MutableNetwork<N1, E1> build() {
-    return new ConfigurableMutableNetwork<N1, E1>(this);
+    return new ConfigurableMutableNetwork<>(this);
   }
 
   @SuppressWarnings("unchecked")

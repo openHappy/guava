@@ -28,8 +28,8 @@ import com.google.common.base.Optional;
  * <p>A graph built by this class will have the following properties by default:
  *
  * <ul>
- * <li>does not allow self-loops
- * <li>orders {@link Graph#nodes()} in the order in which the elements were added
+ *   <li>does not allow self-loops
+ *   <li>orders {@link Graph#nodes()} in the order in which the elements were added
  * </ul>
  *
  * <p>Example of use:
@@ -44,6 +44,12 @@ import com.google.common.base.Optional;
  *
  * @author James Sexton
  * @author Joshua O'Madadhain
+ * @param <N> The most general node type this builder will support. This is normally {@code Object}
+ *     unless it is constrained by using a method like {@link #nodeOrder}, or the builder is
+ *     constructed based on an existing {@code ValueGraph} using {@link #from(ValueGraph)}.
+ * @param <V> The most general value type this builder will support. This is normally {@code Object}
+ *     unless the builder is constructed based on an existing {@code Graph} using {@link
+ *     #from(ValueGraph)}.
  * @since 20.0
  */
 @Beta
@@ -56,12 +62,12 @@ public final class ValueGraphBuilder<N, V> extends AbstractGraphBuilder<N> {
 
   /** Returns a {@link ValueGraphBuilder} for building directed graphs. */
   public static ValueGraphBuilder<Object, Object> directed() {
-    return new ValueGraphBuilder<Object, Object>(true);
+    return new ValueGraphBuilder<>(true);
   }
 
   /** Returns a {@link ValueGraphBuilder} for building undirected graphs. */
   public static ValueGraphBuilder<Object, Object> undirected() {
-    return new ValueGraphBuilder<Object, Object>(false);
+    return new ValueGraphBuilder<>(false);
   }
 
   /**
@@ -110,7 +116,7 @@ public final class ValueGraphBuilder<N, V> extends AbstractGraphBuilder<N> {
    * ValueGraphBuilder}.
    */
   public <N1 extends N, V1 extends V> MutableValueGraph<N1, V1> build() {
-    return new ConfigurableMutableValueGraph<N1, V1>(this);
+    return new ConfigurableMutableValueGraph<>(this);
   }
 
   @SuppressWarnings("unchecked")

@@ -20,6 +20,7 @@ import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
 import java.util.AbstractList;
@@ -27,8 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.RandomAccess;
-import javax.annotation.CheckReturnValue;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * An immutable array of {@code long} values, with an API resembling {@link List}.
@@ -36,8 +36,8 @@ import javax.annotation.Nullable;
  * <p>Advantages compared to {@code long[]}:
  *
  * <ul>
- *   <li>All the many well-known advantages of immutability (read <i>Effective Java</i>, second
- *       edition, Item 15).
+ *   <li>All the many well-known advantages of immutability (read <i>Effective Java</i>, third
+ *       edition, Item 17).
  *   <li>Has the value-based (not identity-based) {@link #equals}, {@link #hashCode}, and {@link
  *       #toString} behavior you expect.
  *   <li>Offers useful operations beyond just {@code get} and {@code length}, so you don't have to
@@ -120,10 +120,16 @@ public final class ImmutableLongArray implements Serializable {
 
   // TODO(kevinb): go up to 11?
 
-  /** Returns an immutable array containing the given values, in order. */
+  /**
+   * Returns an immutable array containing the given values, in order.
+   *
+   * <p>The array {@code rest} must not be longer than {@code Integer.MAX_VALUE - 1}.
+   */
   // Use (first, rest) so that `of(someLongArray)` won't compile (they should use copyOf), which is
   // okay since we have to copy the just-created array anyway.
   public static ImmutableLongArray of(long first, long... rest) {
+    checkArgument(
+        rest.length <= Integer.MAX_VALUE - 1, "the total number of elements must fit in an int");
     long[] array = new long[rest.length + 1];
     array[0] = first;
     System.arraycopy(rest, 0, array, 1, rest.length);
@@ -450,7 +456,7 @@ public final class ImmutableLongArray implements Serializable {
     }
 
     @Override
-    public boolean equals(@Nullable Object object) {
+    public boolean equals(@NullableDecl Object object) {
       if (object instanceof AsList) {
         AsList that = (AsList) object;
         return this.parent.equals(that.parent);
@@ -485,8 +491,12 @@ public final class ImmutableLongArray implements Serializable {
     }
   }
 
+  /**
+   * Returns {@code true} if {@code object} is an {@code ImmutableLongArray} containing the same
+   * values as this one, in the same order.
+   */
   @Override
-  public boolean equals(@Nullable Object object) {
+  public boolean equals(@NullableDecl Object object) {
     if (object == this) {
       return true;
     }

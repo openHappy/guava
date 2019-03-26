@@ -23,9 +23,7 @@ import com.google.common.hash.HashTestUtils.HashFn;
 import java.util.Random;
 import junit.framework.TestCase;
 
-/**
- * Tests for {@link Murmur3_32HashFunction}.
- */
+/** Tests for {@link Murmur3_32HashFunction}. */
 public class Murmur3Hash32Test extends TestCase {
   public void testKnownIntegerInputs() {
     assertHash(593689054, murmur3_32().hashInt(0));
@@ -49,8 +47,20 @@ public class Murmur3Hash32Test extends TestCase {
     assertHash(1510782915, murmur3_32().hashUnencodedChars("hell"));
     assertHash(-675079799, murmur3_32().hashUnencodedChars("hello"));
     assertHash(1935035788, murmur3_32().hashUnencodedChars("http://www.google.com/"));
-    assertHash(-528633700,
-        murmur3_32().hashUnencodedChars("The quick brown fox jumps over the lazy dog"));
+    assertHash(
+        -528633700, murmur3_32().hashUnencodedChars("The quick brown fox jumps over the lazy dog"));
+  }
+
+  public void testKnownUtf8StringInputs() {
+    assertHash(0, murmur3_32().hashString("", Charsets.UTF_8));
+    assertHash(0xcfbda5d1, murmur3_32().hashString("k", Charsets.UTF_8));
+    assertHash(0xa167dbf3, murmur3_32().hashString("hell", Charsets.UTF_8));
+    assertHash(0x248bfa47, murmur3_32().hashString("hello", Charsets.UTF_8));
+    assertHash(0x3d41b97c, murmur3_32().hashString("http://www.google.com/", Charsets.UTF_8));
+    assertHash(
+        0x2e4ff723,
+        murmur3_32().hashString("The quick brown fox jumps over the lazy dog", Charsets.UTF_8));
+    assertHash(0xfc5ba834, murmur3_32().hashString("毎月１日,毎週月曜日", Charsets.UTF_8));
   }
 
   @SuppressWarnings("deprecation")
@@ -89,24 +99,28 @@ public class Murmur3Hash32Test extends TestCase {
   }
 
   public void testParanoidHashBytes() {
-    HashFn hf = new HashFn() {
-      @Override public byte[] hash(byte[] input, int seed) {
-        return murmur3_32(seed).hashBytes(input).asBytes();
-      }
-    };
+    HashFn hf =
+        new HashFn() {
+          @Override
+          public byte[] hash(byte[] input, int seed) {
+            return murmur3_32(seed).hashBytes(input).asBytes();
+          }
+        };
     // Murmur3A, MurmurHash3 for x86, 32-bit (MurmurHash3_x86_32)
     // https://github.com/aappleby/smhasher/blob/master/src/main.cpp
     HashTestUtils.verifyHashFunction(hf, 32, 0xB0F57EE3);
   }
 
   public void testParanoid() {
-    HashFn hf = new HashFn() {
-      @Override public byte[] hash(byte[] input, int seed) {
-        Hasher hasher = murmur3_32(seed).newHasher();
-        Funnels.byteArrayFunnel().funnel(input, hasher);
-        return hasher.hash().asBytes();
-      }
-    };
+    HashFn hf =
+        new HashFn() {
+          @Override
+          public byte[] hash(byte[] input, int seed) {
+            Hasher hasher = murmur3_32(seed).newHasher();
+            Funnels.byteArrayFunnel().funnel(input, hasher);
+            return hasher.hash().asBytes();
+          }
+        };
     // Murmur3A, MurmurHash3 for x86, 32-bit (MurmurHash3_x86_32)
     // https://github.com/aappleby/smhasher/blob/master/src/main.cpp
     HashTestUtils.verifyHashFunction(hf, 32, 0xB0F57EE3);

@@ -35,17 +35,16 @@ import java.util.concurrent.TimeoutException;
  *     untouched. Guava users who want a {@code CheckedFuture} can fork the classes for their own
  *     use, possibly specializing them to the particular exception type they use. We recommend that
  *     most people use {@code ListenableFuture} and perform any exception wrapping themselves. This
- *     class is scheduled for removal from Guava in February 2018.
+ *     class is scheduled for removal from Guava in January 2019.
  */
+// TODO(b/72241575): Remove by 2019-01
 @Beta
 @Deprecated
 @GwtIncompatible
 public abstract class AbstractCheckedFuture<V, X extends Exception>
     extends ForwardingListenableFuture.SimpleForwardingListenableFuture<V>
     implements CheckedFuture<V, X> {
-  /**
-   * Constructs an {@code AbstractCheckedFuture} that wraps a delegate.
-   */
+  /** Constructs an {@code AbstractCheckedFuture} that wraps a delegate. */
   protected AbstractCheckedFuture(ListenableFuture<V> delegate) {
     super(delegate);
   }
@@ -86,9 +85,7 @@ public abstract class AbstractCheckedFuture<V, X extends Exception>
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw mapException(e);
-    } catch (CancellationException e) {
-      throw mapException(e);
-    } catch (ExecutionException e) {
+    } catch (CancellationException | ExecutionException e) {
       throw mapException(e);
     }
   }
@@ -114,9 +111,7 @@ public abstract class AbstractCheckedFuture<V, X extends Exception>
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw mapException(e);
-    } catch (CancellationException e) {
-      throw mapException(e);
-    } catch (ExecutionException e) {
+    } catch (CancellationException | ExecutionException e) {
       throw mapException(e);
     }
   }

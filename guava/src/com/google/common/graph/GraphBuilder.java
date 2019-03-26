@@ -28,8 +28,8 @@ import com.google.common.base.Optional;
  * <p>A graph built by this class will have the following properties by default:
  *
  * <ul>
- * <li>does not allow self-loops
- * <li>orders {@link Graph#nodes()} in the order in which the elements were added
+ *   <li>does not allow self-loops
+ *   <li>orders {@link Graph#nodes()} in the order in which the elements were added
  * </ul>
  *
  * <p>Example of use:
@@ -43,6 +43,9 @@ import com.google.common.base.Optional;
  *
  * @author James Sexton
  * @author Joshua O'Madadhain
+ * @param <N> The most general node type this builder will support. This is normally {@code Object}
+ *     unless it is constrained by using a method like {@link #nodeOrder}, or the builder is
+ *     constructed based on an existing {@code Graph} using {@link #from(Graph)}.
  * @since 20.0
  */
 @Beta
@@ -55,12 +58,12 @@ public final class GraphBuilder<N> extends AbstractGraphBuilder<N> {
 
   /** Returns a {@link GraphBuilder} for building directed graphs. */
   public static GraphBuilder<Object> directed() {
-    return new GraphBuilder<Object>(true);
+    return new GraphBuilder<>(true);
   }
 
   /** Returns a {@link GraphBuilder} for building undirected graphs. */
   public static GraphBuilder<Object> undirected() {
-    return new GraphBuilder<Object>(false);
+    return new GraphBuilder<>(false);
   }
 
   /**

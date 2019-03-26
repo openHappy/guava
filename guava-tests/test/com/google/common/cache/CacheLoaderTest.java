@@ -53,25 +53,26 @@ public class CacheLoaderTest extends TestCase {
     final AtomicInteger reloadCount = new AtomicInteger();
     final AtomicInteger loadAllCount = new AtomicInteger();
 
-    CacheLoader<Object, Object> baseLoader = new CacheLoader<Object, Object>() {
-      @Override
-      public Object load(Object key) {
-        loadCount.incrementAndGet();
-        return new Object();
-      }
+    CacheLoader<Object, Object> baseLoader =
+        new CacheLoader<Object, Object>() {
+          @Override
+          public Object load(Object key) {
+            loadCount.incrementAndGet();
+            return new Object();
+          }
 
-      @Override
-      public ListenableFuture<Object> reload(Object key, Object oldValue) {
-        reloadCount.incrementAndGet();
-        return Futures.immediateFuture(new Object());
-      }
+          @Override
+          public ListenableFuture<Object> reload(Object key, Object oldValue) {
+            reloadCount.incrementAndGet();
+            return Futures.immediateFuture(new Object());
+          }
 
-      @Override
-      public Map<Object, Object> loadAll(Iterable<? extends Object> keys) {
-        loadAllCount.incrementAndGet();
-        return ImmutableMap.of();
-      }
-    };
+          @Override
+          public Map<Object, Object> loadAll(Iterable<?> keys) {
+            loadAllCount.incrementAndGet();
+            return ImmutableMap.of();
+          }
+        };
 
     assertEquals(0, loadCount.get());
     assertEquals(0, reloadCount.get());
@@ -86,8 +87,7 @@ public class CacheLoaderTest extends TestCase {
     assertEquals(1, loadAllCount.get());
 
     QueuingExecutor executor = new QueuingExecutor();
-    CacheLoader<Object, Object> asyncReloader =
-        CacheLoader.asyncReloading(baseLoader, executor);
+    CacheLoader<Object, Object> asyncReloader = CacheLoader.asyncReloading(baseLoader, executor);
 
     asyncReloader.load(new Object());
     @SuppressWarnings("unused") // go/futurereturn-lsc

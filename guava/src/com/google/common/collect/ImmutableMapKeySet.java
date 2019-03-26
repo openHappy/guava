@@ -20,11 +20,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
-import com.google.j2objc.annotations.Weak;
 import java.io.Serializable;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * {@code keySet()} implementation for {@link ImmutableMap}.
@@ -33,8 +32,8 @@ import javax.annotation.Nullable;
  * @author Kevin Bourrillion
  */
 @GwtCompatible(emulated = true)
-final class ImmutableMapKeySet<K, V> extends ImmutableSet.Indexed<K> {
-  @Weak private final ImmutableMap<K, V> map;
+final class ImmutableMapKeySet<K, V> extends IndexedImmutableSet<K> {
+  private final ImmutableMap<K, V> map;
 
   ImmutableMapKeySet(ImmutableMap<K, V> map) {
     this.map = map;

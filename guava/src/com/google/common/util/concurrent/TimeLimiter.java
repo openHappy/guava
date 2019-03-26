@@ -31,18 +31,19 @@ import java.util.concurrent.TimeoutException;
  */
 @Beta
 @GwtIncompatible
+@SuppressWarnings("GoodTime") // should have java.time.Duration overloads
 public interface TimeLimiter {
 
   /**
-   * Returns an instance of {@code interfaceType} that delegates all method calls to the
-   * {@code target} object, enforcing the specified time limit on each call. This time-limited
-   * delegation is also performed for calls to {@link Object#equals}, {@link Object#hashCode}, and
-   * {@link Object#toString}.
+   * Returns an instance of {@code interfaceType} that delegates all method calls to the {@code
+   * target} object, enforcing the specified time limit on each call. This time-limited delegation
+   * is also performed for calls to {@link Object#equals}, {@link Object#hashCode}, and {@link
+   * Object#toString}.
    *
    * <p>If the target method call finishes before the limit is reached, the return value or
    * exception is propagated to the caller exactly as-is. If, on the other hand, the time limit is
-   * reached, the proxy will attempt to abort the call to the target, and will throw an
-   * {@link UncheckedTimeoutException} to the caller.
+   * reached, the proxy will attempt to abort the call to the target, and will throw an {@link
+   * UncheckedTimeoutException} to the caller.
    *
    * <p>It is important to note that the primary purpose of the proxy object is to return control to
    * the caller when the timeout elapses; aborting the target method call is of secondary concern.
@@ -78,32 +79,6 @@ public interface TimeLimiter {
 
   /**
    * Invokes a specified Callable, timing out after the specified time limit. If the target method
-   * call finished before the limit is reached, the return value or exception is propagated to the
-   * caller exactly as-is. If, on the other hand, the time limit is reached, we attempt to abort the
-   * call to the target, and throw an {@link UncheckedTimeoutException} to the caller.
-   *
-   * @param callable the Callable to execute
-   * @param timeoutDuration with timeoutUnit, the maximum length of time to wait
-   * @param timeoutUnit with timeoutDuration, the maximum length of time to wait
-   * @param interruptible whether to respond to thread interruption by aborting the operation and
-   *     throwing InterruptedException; if false, the operation is allowed to complete or time out,
-   *     and the current thread's interrupt status is re-asserted.
-   * @return the result returned by the Callable
-   * @throws InterruptedException if {@code interruptible} is true and our thread is interrupted
-   *     during execution
-   * @throws UncheckedTimeoutException if the time limit is reached
-   * @deprecated Use one of the other {@code call[Uninterruptibly]WithTimeout()} or {@code
-   *     run[Uninterruptibly]WithTimeout()} methods. This method is scheduled to be removed in Guava
-   *     23.0.
-   */
-  @Deprecated
-  @CanIgnoreReturnValue
-  <T> T callWithTimeout(
-      Callable<T> callable, long timeoutDuration, TimeUnit timeoutUnit, boolean interruptible)
-      throws Exception;
-
-  /**
-   * Invokes a specified Callable, timing out after the specified time limit. If the target method
    * call finishes before the limit is reached, the return value or a wrapped exception is
    * propagated. If, on the other hand, the time limit is reached, we attempt to abort the call to
    * the target, and throw a {@link TimeoutException} to the caller.
@@ -119,6 +94,7 @@ public interface TimeLimiter {
    * @throws ExecutionError if {@code callable} throws an {@code Error}
    * @since 22.0
    */
+  @CanIgnoreReturnValue
   <T> T callWithTimeout(Callable<T> callable, long timeoutDuration, TimeUnit timeoutUnit)
       throws TimeoutException, InterruptedException, ExecutionException;
 
@@ -141,6 +117,7 @@ public interface TimeLimiter {
    * @throws ExecutionError if {@code callable} throws an {@code Error}
    * @since 22.0
    */
+  @CanIgnoreReturnValue
   <T> T callUninterruptiblyWithTimeout(
       Callable<T> callable, long timeoutDuration, TimeUnit timeoutUnit)
       throws TimeoutException, ExecutionException;

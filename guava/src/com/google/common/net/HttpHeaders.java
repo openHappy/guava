@@ -19,12 +19,13 @@ import com.google.common.annotations.GwtCompatible;
 
 /**
  * Contains constant definitions for the HTTP header field names. See:
+ *
  * <ul>
- * <li><a href="http://www.ietf.org/rfc/rfc2109.txt">RFC 2109</a>
- * <li><a href="http://www.ietf.org/rfc/rfc2183.txt">RFC 2183</a>
- * <li><a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>
- * <li><a href="http://www.ietf.org/rfc/rfc2965.txt">RFC 2965</a>
- * <li><a href="http://www.ietf.org/rfc/rfc5988.txt">RFC 5988</a>
+ *   <li><a href="http://www.ietf.org/rfc/rfc2109.txt">RFC 2109</a>
+ *   <li><a href="http://www.ietf.org/rfc/rfc2183.txt">RFC 2183</a>
+ *   <li><a href="http://www.ietf.org/rfc/rfc2616.txt">RFC 2616</a>
+ *   <li><a href="http://www.ietf.org/rfc/rfc2965.txt">RFC 2965</a>
+ *   <li><a href="http://www.ietf.org/rfc/rfc5988.txt">RFC 5988</a>
  * </ul>
  *
  *
@@ -72,6 +73,13 @@ public final class HttpHeaders {
   public static final String CONNECTION = "Connection";
   /** The HTTP {@code Cookie} header field name. */
   public static final String COOKIE = "Cookie";
+  /**
+   * The HTTP <a href="https://tools.ietf.org/html/rfc8470">{@code Early-Data}</a> header field
+   * name.
+   *
+   * @since 27.0
+   */
+  public static final String EARLY_DATA = "Early-Data";
   /** The HTTP {@code Expect} header field name. */
   public static final String EXPECT = "Expect";
   /** The HTTP {@code From} header field name. */
@@ -91,6 +99,13 @@ public final class HttpHeaders {
   public static final String FOLLOW_ONLY_WHEN_PRERENDER_SHOWN = "Follow-Only-When-Prerender-Shown";
   /** The HTTP {@code Host} header field name. */
   public static final String HOST = "Host";
+  /**
+   * The HTTP <a href="https://tools.ietf.org/html/rfc7540#section-3.2.1">{@code HTTP2-Settings}
+   * </a> header field name.
+   *
+   * @since 24.0
+   */
+  public static final String HTTP2_SETTINGS = "HTTP2-Settings";
   /** The HTTP {@code If-Match} header field name. */
   public static final String IF_MATCH = "If-Match";
   /** The HTTP {@code If-Modified-Since} header field name. */
@@ -114,8 +129,35 @@ public final class HttpHeaders {
   /** The HTTP {@code Referer} header field name. */
   public static final String REFERER = "Referer";
   /**
-   * The HTTP <a href="https://www.w3.org/TR/service-workers/#update-algorithm">
-   * {@code Service-Worker}</a> header field name.
+   * The HTTP <a href="https://www.w3.org/TR/referrer-policy/">{@code Referrer-Policy}</a> header
+   * field name.
+   *
+   * @since 23.4
+   */
+  public static final String REFERRER_POLICY = "Referrer-Policy";
+
+  /**
+   * Values for the <a href="https://www.w3.org/TR/referrer-policy/">{@code Referrer-Policy}</a>
+   * header.
+   *
+   * @since 23.4
+   */
+  public static final class ReferrerPolicyValues {
+    private ReferrerPolicyValues() {}
+
+    public static final String NO_REFERRER = "no-referrer";
+    public static final String NO_REFFERER_WHEN_DOWNGRADE = "no-referrer-when-downgrade";
+    public static final String SAME_ORIGIN = "same-origin";
+    public static final String ORIGIN = "origin";
+    public static final String STRICT_ORIGIN = "strict-origin";
+    public static final String ORIGIN_WHEN_CROSS_ORIGIN = "origin-when-cross-origin";
+    public static final String STRICT_ORIGIN_WHEN_CROSS_ORIGIN = "strict-origin-when-cross-origin";
+    public static final String UNSAFE_URL = "unsafe-url";
+  }
+
+  /**
+   * The HTTP <a href="https://www.w3.org/TR/service-workers/#update-algorithm">{@code
+   * Service-Worker}</a> header field name.
    */
   public static final String SERVICE_WORKER = "Service-Worker";
   /** The HTTP {@code TE} header field name. */
@@ -158,8 +200,8 @@ public final class HttpHeaders {
   /** The HTTP {@code Content-Range} header field name. */
   public static final String CONTENT_RANGE = "Content-Range";
   /**
-   * The HTTP <a href="http://w3.org/TR/CSP/#content-security-policy-header-field">
-   * {@code Content-Security-Policy}</a> header field name.
+   * The HTTP <a href="http://w3.org/TR/CSP/#content-security-policy-header-field">{@code
+   * Content-Security-Policy}</a> header field name.
    *
    * @since 15.0
    */
@@ -174,26 +216,26 @@ public final class HttpHeaders {
       "Content-Security-Policy-Report-Only";
   /**
    * The HTTP nonstandard {@code X-Content-Security-Policy} header field name. It was introduced in
-   * <a href="https://www.w3.org/TR/2011/WD-CSP-20111129/">CSP v.1</a> and used by the Firefox
-   * until version 23 and the Internet Explorer version 10.
-   * Please, use {@link #CONTENT_SECURITY_POLICY} to pass the CSP.
+   * <a href="https://www.w3.org/TR/2011/WD-CSP-20111129/">CSP v.1</a> and used by the Firefox until
+   * version 23 and the Internet Explorer version 10. Please, use {@link #CONTENT_SECURITY_POLICY}
+   * to pass the CSP.
    *
    * @since 20.0
    */
   public static final String X_CONTENT_SECURITY_POLICY = "X-Content-Security-Policy";
   /**
-   * The HTTP nonstandard {@code X-Content-Security-Policy-Report-Only} header field name.
-   * It was introduced in <a href="https://www.w3.org/TR/2011/WD-CSP-20111129/">CSP v.1</a> and
-   * used by the Firefox until version 23 and the Internet Explorer version 10.
-   * Please, use {@link #CONTENT_SECURITY_POLICY_REPORT_ONLY} to pass the CSP.
+   * The HTTP nonstandard {@code X-Content-Security-Policy-Report-Only} header field name. It was
+   * introduced in <a href="https://www.w3.org/TR/2011/WD-CSP-20111129/">CSP v.1</a> and used by the
+   * Firefox until version 23 and the Internet Explorer version 10. Please, use {@link
+   * #CONTENT_SECURITY_POLICY_REPORT_ONLY} to pass the CSP.
    *
    * @since 20.0
    */
   public static final String X_CONTENT_SECURITY_POLICY_REPORT_ONLY =
       "X-Content-Security-Policy-Report-Only";
   /**
-   * The HTTP nonstandard {@code X-WebKit-CSP} header field name. It was introduced in
-   * <a href="https://www.w3.org/TR/2011/WD-CSP-20111129/">CSP v.1</a> and used by the Chrome until
+   * The HTTP nonstandard {@code X-WebKit-CSP} header field name. It was introduced in <a
+   * href="https://www.w3.org/TR/2011/WD-CSP-20111129/">CSP v.1</a> and used by the Chrome until
    * version 25. Please, use {@link #CONTENT_SECURITY_POLICY} to pass the CSP.
    *
    * @since 20.0
@@ -217,19 +259,39 @@ public final class HttpHeaders {
   public static final String LINK = "Link";
   /** The HTTP {@code Location} header field name. */
   public static final String LOCATION = "Location";
+  /**
+   * The HTTP <a href="https://googlechrome.github.io/OriginTrials/#header">{@code Origin-Trial}</a>
+   * header field name.
+   *
+   * @since 27.1
+   */
+  public static final String ORIGIN_TRIAL = "Origin-Trial";
   /** The HTTP {@code P3P} header field name. Limited browser support. */
   public static final String P3P = "P3P";
   /** The HTTP {@code Proxy-Authenticate} header field name. */
   public static final String PROXY_AUTHENTICATE = "Proxy-Authenticate";
   /** The HTTP {@code Refresh} header field name. Non-standard header supported by most browsers. */
   public static final String REFRESH = "Refresh";
+  /**
+   * The HTTP <a href="https://www.w3.org/TR/reporting/">{@code Report-To}</a> header field name.
+   *
+   * @since 27.1
+   */
+  public static final String REPORT_TO = "Report-To";
   /** The HTTP {@code Retry-After} header field name. */
   public static final String RETRY_AFTER = "Retry-After";
   /** The HTTP {@code Server} header field name. */
   public static final String SERVER = "Server";
   /**
-   * The HTTP <a href="https://www.w3.org/TR/service-workers/#update-algorithm">
-   * {@code Service-Worker-Allowed}</a> header field name.
+   * The HTTP <a href="https://www.w3.org/TR/server-timing/">{@code Server-Timing}</a> header field
+   * name.
+   *
+   * @since 23.6
+   */
+  public static final String SERVER_TIMING = "Server-Timing";
+  /**
+   * The HTTP <a href="https://www.w3.org/TR/service-workers/#update-algorithm">{@code
+   * Service-Worker-Allowed}</a> header field name.
    *
    * @since 20.0
    */
@@ -238,17 +300,24 @@ public final class HttpHeaders {
   public static final String SET_COOKIE = "Set-Cookie";
   /** The HTTP {@code Set-Cookie2} header field name. */
   public static final String SET_COOKIE2 = "Set-Cookie2";
+
   /**
-   * The HTTP
-   * <a href="http://tools.ietf.org/html/rfc6797#section-6.1">{@code Strict-Transport-Security}</a>
-   * header field name.
+   * The HTTP <a href="http://goo.gl/Dxx19N">{@code SourceMap}</a> header field name.
+   *
+   * @since 27.1
+   */
+  @Beta public static final String SOURCE_MAP = "SourceMap";
+
+  /**
+   * The HTTP <a href="http://tools.ietf.org/html/rfc6797#section-6.1">{@code
+   * Strict-Transport-Security}</a> header field name.
    *
    * @since 15.0
    */
   public static final String STRICT_TRANSPORT_SECURITY = "Strict-Transport-Security";
   /**
-   * The HTTP <a href="http://www.w3.org/TR/resource-timing/#cross-origin-resources">
-   * {@code Timing-Allow-Origin}</a> header field name.
+   * The HTTP <a href="http://www.w3.org/TR/resource-timing/#cross-origin-resources">{@code
+   * Timing-Allow-Origin}</a> header field name.
    *
    * @since 15.0
    */
@@ -291,16 +360,15 @@ public final class HttpHeaders {
   /** The HTTP {@code X-Powered-By} header field name. */
   public static final String X_POWERED_BY = "X-Powered-By";
   /**
-   * The HTTP
-   * <a href="http://tools.ietf.org/html/draft-evans-palmer-key-pinning">{@code Public-Key-Pins}</a>
-   * header field name.
+   * The HTTP <a href="http://tools.ietf.org/html/draft-evans-palmer-key-pinning">{@code
+   * Public-Key-Pins}</a> header field name.
    *
    * @since 15.0
    */
   @Beta public static final String PUBLIC_KEY_PINS = "Public-Key-Pins";
   /**
-   * The HTTP <a href="http://tools.ietf.org/html/draft-evans-palmer-key-pinning">
-   * {@code Public-Key-Pins-Report-Only}</a> header field name.
+   * The HTTP <a href="http://tools.ietf.org/html/draft-evans-palmer-key-pinning">{@code
+   * Public-Key-Pins-Report-Only}</a> header field name.
    *
    * @since 15.0
    */
@@ -309,6 +377,16 @@ public final class HttpHeaders {
   public static final String X_REQUESTED_WITH = "X-Requested-With";
   /** The HTTP {@code X-User-IP} header field name. */
   public static final String X_USER_IP = "X-User-IP";
+  /**
+   * The HTTP <a href="https://goo.gl/VKpXxa">{@code X-Download-Options}</a> header field name.
+   *
+   * <p>When the new X-Download-Options header is present with the value {@code noopen}, the user is
+   * prevented from opening a file download directly; instead, they must first save the file
+   * locally.
+   *
+   * @since 24.1
+   */
+  @Beta public static final String X_DOWNLOAD_OPTIONS = "X-Download-Options";
   /** The HTTP {@code X-XSS-Protection} header field name. */
   public static final String X_XSS_PROTECTION = "X-XSS-Protection";
   /**
@@ -332,4 +410,61 @@ public final class HttpHeaders {
    * @since 19.0
    */
   public static final String PING_TO = "Ping-To";
+
+  /**
+   * The HTTP <a href="https://mikewest.github.io/sec-metadata/">{@code Sec-Fetch-Dest}</a> header
+   * field name.
+   *
+   * @since 27.1
+   */
+  public static final String SEC_FETCH_DEST = "Sec-Fetch-Dest";
+  /**
+   * The HTTP <a href="https://mikewest.github.io/sec-metadata/">{@code Sec-Fetch-Mode}</a> header
+   * field name.
+   *
+   * @since 27.1
+   */
+  public static final String SEC_FETCH_MODE = "Sec-Fetch-Mode";
+  /**
+   * The HTTP <a href="https://mikewest.github.io/sec-metadata/">{@code Sec-Fetch-Site}</a> header
+   * field name.
+   *
+   * @since 27.1
+   */
+  public static final String SEC_FETCH_SITE = "Sec-Fetch-Site";
+  /**
+   * The HTTP <a href="https://mikewest.github.io/sec-metadata/">{@code Sec-Fetch-User}</a> header
+   * field name.
+   *
+   * @since 27.1
+   */
+  public static final String SEC_FETCH_USER = "Sec-Fetch-User";
+  /**
+   * The HTTP <a href="https://mikewest.github.io/sec-metadata/">{@code Sec-Metadata}</a> header
+   * field name.
+   *
+   * @since 26.0
+   */
+  public static final String SEC_METADATA = "Sec-Metadata";
+  /**
+   * The HTTP <a href="https://tools.ietf.org/html/draft-ietf-tokbind-https">{@code
+   * Sec-Token-Binding}</a> header field name.
+   *
+   * @since 25.1
+   */
+  public static final String SEC_TOKEN_BINDING = "Sec-Token-Binding";
+  /**
+   * The HTTP <a href="https://tools.ietf.org/html/draft-ietf-tokbind-ttrp">{@code
+   * Sec-Provided-Token-Binding-ID}</a> header field name.
+   *
+   * @since 25.1
+   */
+  public static final String SEC_PROVIDED_TOKEN_BINDING_ID = "Sec-Provided-Token-Binding-ID";
+  /**
+   * The HTTP <a href="https://tools.ietf.org/html/draft-ietf-tokbind-ttrp">{@code
+   * Sec-Referred-Token-Binding-ID}</a> header field name.
+   *
+   * @since 25.1
+   */
+  public static final String SEC_REFERRED_TOKEN_BINDING_ID = "Sec-Referred-Token-Binding-ID";
 }

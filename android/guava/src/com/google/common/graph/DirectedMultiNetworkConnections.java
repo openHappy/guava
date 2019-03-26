@@ -20,7 +20,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.graph.GraphConstants.INNER_CAPACITY;
 import static com.google.common.graph.GraphConstants.INNER_LOAD_FACTOR;
 
-import com.google.common.annotations.GwtIncompatible;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multiset;
@@ -31,7 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * An implementation of {@link NetworkConnections} for directed networks with parallel edges.
@@ -40,7 +39,6 @@ import javax.annotation.Nullable;
  * @param <N> Node parameter type
  * @param <E> Edge parameter type
  */
-@GwtIncompatible
 final class DirectedMultiNetworkConnections<N, E> extends AbstractDirectedNetworkConnections<N, E> {
 
   private DirectedMultiNetworkConnections(
@@ -49,7 +47,7 @@ final class DirectedMultiNetworkConnections<N, E> extends AbstractDirectedNetwor
   }
 
   static <N, E> DirectedMultiNetworkConnections<N, E> of() {
-    return new DirectedMultiNetworkConnections<N, E>(
+    return new DirectedMultiNetworkConnections<>(
         new HashMap<E, N>(INNER_CAPACITY, INNER_LOAD_FACTOR),
         new HashMap<E, N>(INNER_CAPACITY, INNER_LOAD_FACTOR),
         0);
@@ -57,12 +55,11 @@ final class DirectedMultiNetworkConnections<N, E> extends AbstractDirectedNetwor
 
   static <N, E> DirectedMultiNetworkConnections<N, E> ofImmutable(
       Map<E, N> inEdges, Map<E, N> outEdges, int selfLoopCount) {
-    return new DirectedMultiNetworkConnections<N, E>(
+    return new DirectedMultiNetworkConnections<>(
         ImmutableMap.copyOf(inEdges), ImmutableMap.copyOf(outEdges), selfLoopCount);
   }
 
-  @LazyInit
-  private transient Reference<Multiset<N>> predecessorsReference;
+  @LazyInit private transient Reference<Multiset<N>> predecessorsReference;
 
   @Override
   public Set<N> predecessors() {
@@ -73,13 +70,12 @@ final class DirectedMultiNetworkConnections<N, E> extends AbstractDirectedNetwor
     Multiset<N> predecessors = getReference(predecessorsReference);
     if (predecessors == null) {
       predecessors = HashMultiset.create(inEdgeMap.values());
-      predecessorsReference = new SoftReference<Multiset<N>>(predecessors);
+      predecessorsReference = new SoftReference<>(predecessors);
     }
     return predecessors;
   }
 
-  @LazyInit
-  private transient Reference<Multiset<N>> successorsReference;
+  @LazyInit private transient Reference<Multiset<N>> successorsReference;
 
   @Override
   public Set<N> successors() {
@@ -90,7 +86,7 @@ final class DirectedMultiNetworkConnections<N, E> extends AbstractDirectedNetwor
     Multiset<N> successors = getReference(successorsReference);
     if (successors == null) {
       successors = HashMultiset.create(outEdgeMap.values());
-      successorsReference = new SoftReference<Multiset<N>>(successors);
+      successorsReference = new SoftReference<>(successors);
     }
     return successors;
   }
@@ -143,8 +139,8 @@ final class DirectedMultiNetworkConnections<N, E> extends AbstractDirectedNetwor
     }
   }
 
-  @Nullable
-  private static <T> T getReference(@Nullable Reference<T> reference) {
+  @NullableDecl
+  private static <T> T getReference(@NullableDecl Reference<T> reference) {
     return (reference == null) ? null : reference.get();
   }
 }

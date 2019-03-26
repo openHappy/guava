@@ -16,9 +16,13 @@
 
 package com.google.common.graph;
 
+import static com.google.common.graph.GraphConstants.ENDPOINTS_MISMATCH;
 import static com.google.common.graph.TestUtil.assertStronglyEquivalent;
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth8.assertThat;
+import static org.junit.Assert.fail;
 
+import java.util.Optional;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,6 +61,8 @@ public final class ValueGraphTest {
         boolean hasEdge = graph.hasEdgeConnecting(node, otherNode);
         assertThat(hasEdge).isEqualTo(asGraph.hasEdgeConnecting(node, otherNode));
         assertThat(graph.edgeValueOrDefault(node, otherNode, null) != null).isEqualTo(hasEdge);
+        assertThat(!graph.edgeValueOrDefault(node, otherNode, DEFAULT).equals(DEFAULT))
+            .isEqualTo(hasEdge);
       }
     }
   }
@@ -73,6 +79,10 @@ public final class ValueGraphTest {
     assertThat(graph.edgeValueOrDefault(2, 1, null)).isEqualTo("valueB");
     assertThat(graph.edgeValueOrDefault(2, 3, null)).isEqualTo("valueC");
     assertThat(graph.edgeValueOrDefault(4, 4, null)).isEqualTo("valueD");
+    assertThat(graph.edgeValueOrDefault(1, 2, DEFAULT)).isEqualTo("valueA");
+    assertThat(graph.edgeValueOrDefault(2, 1, DEFAULT)).isEqualTo("valueB");
+    assertThat(graph.edgeValueOrDefault(2, 3, DEFAULT)).isEqualTo("valueC");
+    assertThat(graph.edgeValueOrDefault(4, 4, DEFAULT)).isEqualTo("valueD");
 
     String toString = graph.toString();
     assertThat(toString).contains("valueA");
@@ -93,12 +103,159 @@ public final class ValueGraphTest {
     assertThat(graph.edgeValueOrDefault(2, 1, null)).isEqualTo("valueB");
     assertThat(graph.edgeValueOrDefault(2, 3, null)).isEqualTo("valueC");
     assertThat(graph.edgeValueOrDefault(4, 4, null)).isEqualTo("valueD");
+    assertThat(graph.edgeValueOrDefault(1, 2, DEFAULT)).isEqualTo("valueB");
+    assertThat(graph.edgeValueOrDefault(2, 1, DEFAULT)).isEqualTo("valueB");
+    assertThat(graph.edgeValueOrDefault(2, 3, DEFAULT)).isEqualTo("valueC");
+    assertThat(graph.edgeValueOrDefault(4, 4, DEFAULT)).isEqualTo("valueD");
 
     String toString = graph.toString();
     assertThat(toString).doesNotContain("valueA");
     assertThat(toString).contains("valueB");
     assertThat(toString).contains("valueC");
     assertThat(toString).contains("valueD");
+  }
+
+  @Test
+  public void hasEdgeConnecting_directed_correct() {
+    graph = ValueGraphBuilder.directed().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.hasEdgeConnecting(EndpointPair.ordered(1, 2))).isTrue();
+  }
+
+  @Test
+  public void hasEdgeConnecting_directed_backwards() {
+    graph = ValueGraphBuilder.directed().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.hasEdgeConnecting(EndpointPair.ordered(2, 1))).isFalse();
+  }
+
+  @Test
+  public void hasEdgeConnecting_directed_mismatch() {
+    graph = ValueGraphBuilder.directed().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.hasEdgeConnecting(EndpointPair.unordered(1, 2))).isFalse();
+    assertThat(graph.hasEdgeConnecting(EndpointPair.unordered(2, 1))).isFalse();
+  }
+
+  @Test
+  public void hasEdgeConnecting_undirected_correct() {
+    graph = ValueGraphBuilder.undirected().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.hasEdgeConnecting(EndpointPair.unordered(1, 2))).isTrue();
+  }
+
+  @Test
+  public void hasEdgeConnecting_undirected_backwards() {
+    graph = ValueGraphBuilder.undirected().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.hasEdgeConnecting(EndpointPair.unordered(2, 1))).isTrue();
+  }
+
+  @Test
+  public void hasEdgeConnecting_undirected_mismatch() {
+    graph = ValueGraphBuilder.undirected().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.hasEdgeConnecting(EndpointPair.ordered(1, 2))).isTrue();
+    assertThat(graph.hasEdgeConnecting(EndpointPair.ordered(2, 1))).isTrue();
+  }
+
+  @Test
+  public void edgeValue_directed_correct() {
+    graph = ValueGraphBuilder.directed().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.edgeValue(EndpointPair.ordered(1, 2))).hasValue("A");
+  }
+
+  @Test
+  public void edgeValue_directed_backwards() {
+    graph = ValueGraphBuilder.directed().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.edgeValue(EndpointPair.ordered(2, 1))).isEmpty();
+  }
+
+  @Test
+  public void edgeValue_directed_mismatch() {
+    graph = ValueGraphBuilder.directed().build();
+    graph.putEdgeValue(1, 2, "A");
+    try {
+      Optional<String> unused = graph.edgeValue(EndpointPair.unordered(1, 2));
+      unused = graph.edgeValue(EndpointPair.unordered(2, 1));
+      fail("Expected IllegalArgumentException: " + ENDPOINTS_MISMATCH);
+    } catch (IllegalArgumentException e) {
+      assertThat(e).hasMessageThat().contains(ENDPOINTS_MISMATCH);
+    }
+  }
+
+  @Test
+  public void edgeValue_undirected_correct() {
+    graph = ValueGraphBuilder.undirected().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.edgeValue(EndpointPair.unordered(1, 2))).hasValue("A");
+  }
+
+  @Test
+  public void edgeValue_undirected_backwards() {
+    graph = ValueGraphBuilder.undirected().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.edgeValue(EndpointPair.unordered(2, 1))).hasValue("A");
+  }
+
+  @Test
+  public void edgeValue_undirected_mismatch() {
+    graph = ValueGraphBuilder.undirected().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.edgeValue(EndpointPair.ordered(1, 2))).hasValue("A");
+    assertThat(graph.edgeValue(EndpointPair.ordered(2, 1))).hasValue("A");
+  }
+
+  @Test
+  public void edgeValueOrDefault_directed_correct() {
+    graph = ValueGraphBuilder.directed().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.edgeValueOrDefault(EndpointPair.ordered(1, 2), "default")).isEqualTo("A");
+  }
+
+  @Test
+  public void edgeValueOrDefault_directed_backwards() {
+    graph = ValueGraphBuilder.directed().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.edgeValueOrDefault(EndpointPair.ordered(2, 1), "default"))
+        .isEqualTo("default");
+  }
+
+  @Test
+  public void edgeValueOrDefault_directed_mismatch() {
+    graph = ValueGraphBuilder.directed().build();
+    graph.putEdgeValue(1, 2, "A");
+    try {
+      String unused = graph.edgeValueOrDefault(EndpointPair.unordered(1, 2), "default");
+      unused = graph.edgeValueOrDefault(EndpointPair.unordered(2, 1), "default");
+      fail("Expected IllegalArgumentException: " + ENDPOINTS_MISMATCH);
+    } catch (IllegalArgumentException e) {
+      assertThat(e).hasMessageThat().contains(ENDPOINTS_MISMATCH);
+    }
+  }
+
+  @Test
+  public void edgeValueOrDefault_undirected_correct() {
+    graph = ValueGraphBuilder.undirected().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.edgeValueOrDefault(EndpointPair.unordered(1, 2), "default")).isEqualTo("A");
+  }
+
+  @Test
+  public void edgeValueOrDefault_undirected_backwards() {
+    graph = ValueGraphBuilder.undirected().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.edgeValueOrDefault(EndpointPair.unordered(2, 1), "default")).isEqualTo("A");
+  }
+
+  @Test
+  public void edgeValueOrDefault_undirected_mismatch() {
+    graph = ValueGraphBuilder.undirected().build();
+    graph.putEdgeValue(1, 2, "A");
+    assertThat(graph.edgeValueOrDefault(EndpointPair.ordered(2, 1), "default")).isEqualTo("A");
+    assertThat(graph.edgeValueOrDefault(EndpointPair.ordered(2, 1), "default")).isEqualTo("A");
   }
 
   @Test
@@ -109,6 +266,23 @@ public final class ValueGraphTest {
     assertThat(graph.putEdgeValue(2, 1, "valueB")).isNull();
     assertThat(graph.putEdgeValue(1, 2, "valueC")).isEqualTo("valueA");
     assertThat(graph.putEdgeValue(2, 1, "valueD")).isEqualTo("valueB");
+  }
+
+  @Test
+  public void putEdgeValue_directed_orderMismatch() {
+    graph = ValueGraphBuilder.directed().build();
+    try {
+      graph.putEdgeValue(EndpointPair.unordered(1, 2), "irrelevant");
+      fail("Expected IllegalArgumentException: " + ENDPOINTS_MISMATCH);
+    } catch (IllegalArgumentException e) {
+      assertThat(e).hasMessageThat().contains(ENDPOINTS_MISMATCH);
+    }
+  }
+
+  @Test
+  public void putEdgeValue_undirected_orderMismatch() {
+    graph = ValueGraphBuilder.undirected().build();
+    assertThat(graph.putEdgeValue(EndpointPair.ordered(1, 2), "irrelevant")).isNull();
   }
 
   @Test
@@ -151,16 +325,43 @@ public final class ValueGraphTest {
   }
 
   @Test
+  public void removeEdge_directed_orderMismatch() {
+    graph = ValueGraphBuilder.directed().build();
+    graph.putEdgeValue(1, 2, "1->2");
+    graph.putEdgeValue(2, 1, "2->1");
+    try {
+      graph.removeEdge(EndpointPair.unordered(1, 2));
+      graph.removeEdge(EndpointPair.unordered(2, 1));
+      fail("Expected IllegalArgumentException: " + ENDPOINTS_MISMATCH);
+    } catch (IllegalArgumentException e) {
+      assertThat(e).hasMessageThat().contains(ENDPOINTS_MISMATCH);
+    }
+  }
+
+  @Test
+  public void removeEdge_undirected_orderMismatch() {
+    graph = ValueGraphBuilder.undirected().build();
+    graph.putEdgeValue(1, 2, "1-2");
+    assertThat(graph.removeEdge(EndpointPair.ordered(1, 2))).isEqualTo("1-2");
+  }
+
+  @Test
   public void edgeValue_missing() {
     graph = ValueGraphBuilder.directed().build();
 
-    assertThat(graph.edgeValueOrDefault(1, 2, null)).isNull();
-    assertThat(graph.edgeValueOrDefault(2, 1, null)).isNull();
+    assertThat(graph.edgeValueOrDefault(1, 2, DEFAULT)).isEqualTo(DEFAULT);
+    assertThat(graph.edgeValueOrDefault(2, 1, DEFAULT)).isEqualTo(DEFAULT);
     assertThat(graph.edgeValue(1, 2).orElse(DEFAULT)).isEqualTo(DEFAULT);
     assertThat(graph.edgeValue(2, 1).orElse(DEFAULT)).isEqualTo(DEFAULT);
+    assertThat(graph.edgeValueOrDefault(1, 2, null)).isNull();
+    assertThat(graph.edgeValueOrDefault(2, 1, null)).isNull();
+    assertThat(graph.edgeValue(1, 2).orElse(null)).isNull();
+    assertThat(graph.edgeValue(2, 1).orElse(null)).isNull();
 
     graph.putEdgeValue(1, 2, "valueA");
     graph.putEdgeValue(2, 1, "valueB");
+    assertThat(graph.edgeValueOrDefault(1, 2, DEFAULT)).isEqualTo("valueA");
+    assertThat(graph.edgeValueOrDefault(2, 1, DEFAULT)).isEqualTo("valueB");
     assertThat(graph.edgeValueOrDefault(1, 2, null)).isEqualTo("valueA");
     assertThat(graph.edgeValueOrDefault(2, 1, null)).isEqualTo("valueB");
     assertThat(graph.edgeValue(1, 2).get()).isEqualTo("valueA");
@@ -168,9 +369,12 @@ public final class ValueGraphTest {
 
     graph.removeEdge(1, 2);
     graph.putEdgeValue(2, 1, "valueC");
+    assertThat(graph.edgeValueOrDefault(1, 2, DEFAULT)).isEqualTo(DEFAULT);
+    assertThat(graph.edgeValueOrDefault(2, 1, DEFAULT)).isEqualTo("valueC");
+    assertThat(graph.edgeValue(1, 2).orElse(DEFAULT)).isEqualTo(DEFAULT);
     assertThat(graph.edgeValueOrDefault(1, 2, null)).isNull();
     assertThat(graph.edgeValueOrDefault(2, 1, null)).isEqualTo("valueC");
-    assertThat(graph.edgeValue(1, 2).orElse(DEFAULT)).isEqualTo(DEFAULT);
+    assertThat(graph.edgeValue(1, 2).orElse(null)).isNull();
     assertThat(graph.edgeValue(2, 1).get()).isEqualTo("valueC");
   }
 
